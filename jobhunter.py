@@ -22,8 +22,7 @@ def create_tables(cursor):
     # Creates table
     # Must set Title to CHARSET utf8 unicode Source: http://mysql.rjweb.org/doc.php/charcoll.
     # Python is in latin-1 and error (Incorrect string value: '\xE2\x80\xAFAbi...') will occur if Description is not in unicode format due to the json data
-    cursor.execute("CREATE TABLE IF NOT EXISTS jobs (id INT PRIMARY KEY auto_increment, Job_id varchar(50), company varchar (300), Created_at DATE, url varchar(30000), Title LONGBLOB, Description LONGBLOB );")
-
+    cursor.execute("CREATE TABLE IF NOT EXISTS jobs (id INT PRIMARY KEY auto_increment, Job_id VARCHAR(50), company VARCHAR(300), Created_at DATE, url VARCHAR(30000), Title LONGBLOB, Description LONGBLOB);")
 # Query the database.
 # You should not need to edit anything in this function
 def query_sql(cursor, query):
@@ -34,12 +33,15 @@ def query_sql(cursor, query):
 def add_new_job(cursor, jobdetails):
     # extract all required columns
     job_id = jobdetails['id']
+    company = jobdetails['company_name']
     date = jobdetails['publication_date'][0:10]
+    url = jobdetails['url']
+    title = jobdetails['title']
     description = html2text.html2text(jobdetails['description'])
     # %s is what is needed for Mysqlconnector as SQLite3 uses ? the Mysqlconnector uses %s
     query = cursor.execute(
-        "INSERT INTO jobs (Job_id, Created_at, Description)"
-        "VALUES (%s, %s, %s)", (job_id, date, description)
+        "INSERT INTO jobs (Job_id, company, Created_at, url, Title, Description)"
+        "VALUES (%s, %s, %s, %s, %s, %s)", (job_id, company, date, url, title, description)
     )
     return query_sql(cursor, query)
 
@@ -104,7 +106,7 @@ def add_or_delete_job(jobpage, cursor):
         num_of_days = (present_date - job_date).days
 
         if int(job_id) not in job_id_from_json or num_of_days > 14:
-            delete_job(cursor, int(job_id[0]))
+            delete_job(cursor, int(job_id))
             print(f'-- old job listing removed: {job_id}')
     #print('finished delete section')
 
@@ -116,6 +118,7 @@ def main():
     conn = connect_to_sql()
     cursor = conn.cursor()
     create_tables(cursor)
+    cursor.execute("ALTER TABLE jobs CHANGE company company VARCHAR(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
 
     while(1):  # Infinite Loops. Only way to kill it is to crash or manually crash it. We did this as a background process/passive scraper
         jobhunt(cursor)
