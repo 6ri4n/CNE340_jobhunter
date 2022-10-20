@@ -1,10 +1,11 @@
+# automation script that uses an API to retrieve job listings and stores them in a database
+
 import mysql.connector
 import time
 import json
 import requests
 from datetime import date
 import html2text
-
 
 # Connect to database
 # You may need to edit the connect function based on your local settings.
@@ -106,7 +107,6 @@ def add_or_delete_job(jobpage, cursor):
             delete_job(cursor, int(job_id[0]))
             print(f'-- old job listing removed: {job_id}')
     #print('finished delete section')
-
 
 # Setup portion of the program. Take arguments and set up the script
 # You should not need to edit anything here.
