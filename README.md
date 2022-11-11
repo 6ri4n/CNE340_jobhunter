@@ -1,7 +1,7 @@
-# CNE340_jobhunter
-This is an automation script that scrapes data from an API that sends job listings in JSON format.
+# Job Hunter
+Automation script in Python that retrieves and stores job listings into a MySQL database from an API every hour.
 
 this script will perform the following every hour:
-- makes a request to the API to check the job listings
-- inserts any new job listings to a database
-- deletes any job listings from the database that are over 14 days old or if they've been taken down
+- requests an API for job listings
+- storing any new job listings to a database
+- removing any job listings from the database if they're over 14 days old or if they're no longer available
